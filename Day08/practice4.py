@@ -42,12 +42,54 @@
 # - 머신러닝 모델 입력을 위해 명목형 범주 변수인 'Payment'와 'VIP_Flag'를 원-핫 인코딩(get_dummies)하세요.
 # - 단, 결과값이 True/False가 아닌 1과 0의 정수형(dtype=int)으로 생성되도록 옵션을 지정하세요.
 # ==============================================================================
+from pathlib import Path
+
 import pandas as pd
 
 # [기본 제공 코드] CSV 파일 로드 및 구조 확인
-df = pd.read_csv('./ecommerce_orders_cs_data.csv', encoding='utf-8-sig')
+csv_path = Path(__file__).with_name('ecommerce_orders_cs_data.csv')
+df = pd.read_csv(csv_path, encoding='utf-8-sig')
 
 print("--- [데이터 기본 구조 확인] ---")
-print(df.info())
+df.info()
 print("\n--- [상위 5건 데이터] ---")
 print(df.head())
+
+# [Step 1] 중복 행 제거, 인덱스 재정렬 및 고객 ID 타입 변환
+df = df.drop_duplicates().reset_index(drop=True)
+df['Customer_ID'] = df['Customer_ID'].astype(str)
+
+# [Step 2] 빈 문자열과 공백을 결측치로 바꾼 뒤 최빈값/중앙값으로 대체
+df['Category'] = df['Category'].replace(r'^\s*$', None, regex=True)
+df['Category'] = df['Category'].fillna(df['Category'].mode().iloc[0])
+df['Price'] = df['Price'].fillna(df['Price'].median())
+
+# [Step 3] 수량을 1 이상 10 이하로 보정
+df['Quantity'] = df['Quantity'].clip(lower=1, upper=10)
+
+# [Step 4] 주문 금액, 연도, 월 및 VIP 여부 생성
+df['Total_Amount'] = df['Price'] * df['Quantity']
+df['Order_Date'] = pd.to_datetime(df['Order_Date'])
+df['Order_Year'] = df['Order_Date'].dt.year
+df['Order_Month'] = df['Order_Date'].dt.month
+df['VIP_Flag'] = 'Normal'
+df['VIP_Flag'] = df['VIP_Flag'].mask(df['Total_Amount'] >= 300_000, 'VIP')
+
+print('\n--- [정제 및 파생변수 생성 결과] ---')
+print(df.head())
+
+# [Step 5] 문제에 나열된 3가지 지표를 한 번에 집계하고 총매출순 정렬
+category_summary = df.groupby('Category').agg(
+    주문건수=('Order_ID', 'count'),
+    총매출=('Total_Amount', 'sum'),
+    평균단가=('Price', 'mean'),
+).sort_values('총매출', ascending=False)
+
+print('\n--- [카테고리별 집계 결과] ---')
+print(category_summary)
+
+# [Step 6] 결제 수단과 VIP 여부를 정수형 0/1로 원-핫 인코딩
+df_encoded = pd.get_dummies(df, columns=['Payment', 'VIP_Flag'], dtype=int)
+
+print('\n--- [원-핫 인코딩 결과] ---')
+print(df_encoded.head())

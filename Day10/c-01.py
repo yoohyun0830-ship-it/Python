@@ -10,7 +10,8 @@
     # 2. 개발자도구(F12) -> CTRL+SHIFT+C -> 크롤링 요소 선택 -> 선택자/식별자 확인 
 
 # 설치1 : pip install requests
-# 설치2 : pip install beautifulsoup4
+# 설치2 : 
+
 
 # 1] 네이버 검색 정보 크롤링( 정적 )
 # 1. 크롤링 주소 가져오기 , *파라미터 정리* , ?쿼리스트링 

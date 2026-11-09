@@ -88,3 +88,101 @@ df = pd.DataFrame(common_data)
 # - 회원등급: ['Bronze', 'Silver', 'Gold', 'VIP'] (비율 4:3:2:1)
 # - 주요결제수단: ['신용카드', '간편결제', '계좌이체'] (비율 50%, 35%, 15%)
 # - 재구매여부: ['Yes', 'No'] (비율 70%, 30%)
+
+# 문제 1: 상위 10명의 두 지표를 하나의 선 그래프로 비교
+top10 = df.head(10)
+plt.figure(figsize=(8, 5))
+plt.plot(top10.index, top10['월이용금액'], marker='o', label='월이용금액')
+plt.plot(top10.index, top10['만족도점수'], marker='s', label='만족도점수')
+plt.xlabel('고객 인덱스')
+plt.ylabel('월이용금액(천원) / 만족도점수(점)')
+plt.title('상위 10명 고객 지표 추이')
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# 문제 2: 결제수단별 빈도 막대그래프
+payment_counts = df['주요결제수단'].value_counts()
+plt.figure(figsize=(7, 5))
+plt.bar(payment_counts.index, payment_counts.values)
+plt.xlabel('결제수단')
+plt.ylabel('건수')
+plt.title('주요 결제수단별 빈도')
+plt.tight_layout()
+plt.show()
+
+# 문제 3: 연령과 월이용금액의 관계
+plt.figure(figsize=(7, 5))
+plt.scatter(df['연령'], df['월이용금액'], alpha=0.7)
+plt.xlabel('연령(세)')
+plt.ylabel('월이용금액(천원)')
+plt.title('연령과 월이용금액의 관계')
+plt.tight_layout()
+plt.show()
+
+# 문제 4: 만족도점수의 구간별 빈도
+plt.figure(figsize=(7, 5))
+plt.hist(df['만족도점수'], bins=10, edgecolor='black')
+plt.xlabel('만족도점수(점)')
+plt.ylabel('빈도')
+plt.title('만족도점수 분포')
+plt.tight_layout()
+plt.show()
+
+# 문제 5: 월이용금액의 중앙값, 사분위수 및 이상치
+plt.figure(figsize=(6, 5))
+plt.boxplot(df['월이용금액'], showfliers=True)
+plt.xticks([1], ['월이용금액'])
+plt.ylabel('월이용금액(천원)')
+plt.title('월이용금액 분포 및 이상치')
+plt.tight_layout()
+plt.show()
+
+# 문제 6: 회원등급 내 재구매 여부별 인원수
+plt.figure(figsize=(8, 5))
+sns.countplot(data=df, x='회원등급', hue='재구매여부',
+              order=['Bronze', 'Silver', 'Gold', 'VIP'])
+plt.xlabel('회원등급')
+plt.ylabel('인원수')
+plt.title('회원등급별 재구매 여부 분포')
+plt.tight_layout()
+plt.show()
+
+# 문제 7: 결제수단별 월이용금액 분포 비교
+plt.figure(figsize=(7, 5))
+sns.boxplot(data=df, x='주요결제수단', y='월이용금액')
+plt.xlabel('주요결제수단')
+plt.ylabel('월이용금액(천원)')
+plt.title('결제수단별 월이용금액 분포')
+plt.tight_layout()
+plt.show()
+
+# 문제 8: 수치형 변수의 피어슨 상관계수 행렬
+correlation = df[['연령', '월이용금액', '구매건수', '만족도점수']].corr()
+plt.figure(figsize=(7, 6))
+sns.heatmap(correlation, annot=True, fmt='.2f', cmap='coolwarm',
+            vmin=-1, vmax=1, center=0, square=True)
+plt.title('수치형 변수 간 상관계수')
+plt.tight_layout()
+plt.show()
+
+# 문제 9: 회원등급별 구매건수와 만족도점수의 관계
+plt.figure(figsize=(8, 5))
+sns.scatterplot(data=df, x='구매건수', y='만족도점수', hue='회원등급',
+                hue_order=['Bronze', 'Silver', 'Gold', 'VIP'], alpha=0.7)
+plt.xlabel('구매건수')
+plt.ylabel('만족도점수(점)')
+plt.title('회원등급별 구매건수와 만족도점수의 관계')
+plt.tight_layout()
+plt.show()
+
+# 문제 10: 재구매 여부에 따른 변수 쌍의 관계와 개별 분포
+pair_grid = sns.pairplot(
+    data=df[['연령', '월이용금액', '만족도점수', '재구매여부']],
+    vars=['연령', '월이용금액', '만족도점수'],
+    hue='재구매여부',
+    diag_kind='hist',
+    plot_kws={'alpha': 0.7},
+)
+pair_grid.figure.suptitle('재구매 여부별 주요 수치형 변수 관계', y=1.02)
+plt.show()
