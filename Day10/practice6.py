@@ -102,6 +102,16 @@ print(pd.crosstab(df['Embarked'], df['Pclass'], normalize='index').round(3))
 # 5-3 (인기 대여소): value_counts().head(10)를 활용하여 가장 활발한 상위 10개 대여소를 가로 막대 그래프로 시각화한다.
 # 5-4 (상관관계): sns.heatmap을 통해 이용시간, 이용거리, 시간대 등 수치 데이터 간의 밀접도를 분석한다.
 
+# 문제 2: 공공자전거 1월·2월 데이터
+data1 = pd.read_csv(
+    data_dir / '서울특별시 공공자전거 대여이력 정보_2501.csv',
+    encoding='cp949'
+)
+
+data2 = pd.read_csv(
+    data_dir / '서울특별시 공공자전거 대여이력 정보_2502.csv',
+    encoding='cp949'
+)
 def analyze_bikes(data1, data2):
     # [4-1] 월별 데이터 병합 및 인덱스 재부여
     bike_df = pd.concat([data1, data2], ignore_index=True)
