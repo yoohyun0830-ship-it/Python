@@ -86,3 +86,4 @@ import joblib
 joblib.dump(best_pipe, './Day14/fish_model.pkl')
 
 # 2) 다른 파이썬 파일에서 저장된 모델 불러오기
+
